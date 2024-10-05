@@ -1,0 +1,79 @@
+<!-- Vista/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recordatorio de Cumpleaños</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #697565;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-white">Recordatorio de Cumpleaños</h1>
+        <form id="birthdayForm">
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" class="form-control" id="nombre" placeholder="Nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="fecha">Fecha de Cumpleaños</label>
+                <input type="date" class="form-control" id="fecha" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar Cumpleaños</button>
+            <button type="button" class="btn btn-danger" id="limpiarBtn">Limpiar Cumpleaños</button>
+        </form>
+
+        <ul id="cumpleañosList" class="list-group mt-3"></ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="../Modelo/Cumpleaños.js"></script>
+    <script src="../Controlador/CumpleañosCTRL.js"></script>
+    <script>
+        $(document).ready(function() {
+            const modelo = new ListaDeCumpleaños();
+            const vista = {
+                mostrarCumpleaños: function(cumpleaños) {
+                    const lista = $('#cumpleañosList');
+                    lista.html('');
+                    cumpleaños.forEach(cumple => {
+                        const edad = cumple.calcularEdad();
+                        lista.append(`
+                            <li class="list-group-item">
+                                <h5>${cumple.nombre} - ${cumple.fecha.toLocaleDateString()} (${edad} años)</h5>
+                                <button class="btn btn-danger btn-sm eliminarBtn" data-id="${cumple.id}">Eliminar</button>
+                            </li>
+                        `);
+                    });
+                },
+                vincularAgregarCumpleaños: function(handler) {
+                    $('#birthdayForm').on('submit', function(event) {
+                        event.preventDefault();
+                        const nombre = $('#nombre').val();
+                        const fecha = $('#fecha').val();
+                        handler(nombre, fecha);
+                    });
+                },
+                vincularEliminarCumpleaños: function(handler) {
+                    $('#cumpleañosList').on('click', '.eliminarBtn', function() {
+                        const id = $(this).data('id');
+                        handler(id);
+                    });
+                },
+                vincularLimpiarCumpleaños: function(handler) {
+                    $('#limpiarBtn').on('click', function() {
+                        handler();
+                    });
+                }
+            };
+
+            const controlador = new CumpleañosCTRL(modelo, vista);
+        });
+    </script>
+</body>
+</html>
